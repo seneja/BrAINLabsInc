@@ -8,6 +8,7 @@ export interface TeamMember {
     linkedin?: string;
     website?: string;
     image?: string;
+    status: 'current' | 'past';
 }
 
 export const team: TeamMember[] = [
@@ -24,7 +25,8 @@ export const team: TeamMember[] = [
         ],
         contact: "mahima.w@sliit.lk",
         linkedin: "https://www.linkedin.com/in/mahimaweerasinghe/",
-        image: "/assets/images/mahima-weerasinghe.jpeg"
+        image: "/assets/images/mahima-weerasinghe.jpeg",
+        status: "current"
     },
     {
         name: "Dr. Dinuka Sahabandu",
@@ -40,7 +42,8 @@ export const team: TeamMember[] = [
         ],
         contact: "dinuka.s@sliit.lk",
         linkedin: "https://www.linkedin.com/in/dinuka-sahabandu-48898726b/",
-        image: "/assets/images/dinuka-sahabandu.jpeg"
+        image: "/assets/images/dinuka-sahabandu.jpeg",
+        status: "current"
     },
     {
         name: "Dr. Dharshana Kasthurirathna",
@@ -55,7 +58,8 @@ export const team: TeamMember[] = [
         ],
         contact: "dharshana.k@sliit.lk",
         linkedin: "https://www.linkedin.com/in/dharshana-kasthurirathna-a4a3275/",
-        image: "/assets/images/dharshana_kasthurirathna.jpeg"
+        image: "/assets/images/dharshana_kasthurirathna.jpeg",
+        status: "current"
     },
     {
         name: "Dr. Kapila Dissanayaka",
@@ -70,7 +74,8 @@ export const team: TeamMember[] = [
         ],
         contact: "kapila.d@sliit.lk",
         linkedin: "https://www.linkedin.com/in/kapila-d-dissanayaka/",
-        image: "/assets/images/kapila_dissanayaka.jpeg"
+        image: "/assets/images/kapila_dissanayaka.jpeg",
+        status: "current"
     },
     {
         name: "Mr. Jeewaka Perera",
@@ -86,7 +91,8 @@ export const team: TeamMember[] = [
         ],
         contact: "jeewaka.p@sliit.lk",
         linkedin: "https://www.linkedin.com/in/jeewakaperera/",
-        image: "/assets/images/jeewaka_perera.jpeg"
+        image: "/assets/images/jeewaka_perera.jpeg",
+        status: "current"
     },
     {
         name: "Ms. Madhumini Gunaratne",
@@ -100,7 +106,8 @@ export const team: TeamMember[] = [
             "AI in Agriculture"
         ],
         contact: "madhumini.g@sliit.lk",
-        image: "/assets/images/madhumini_gunaratne.jpeg"
+        image: "/assets/images/madhumini_gunaratne.jpeg",
+        status: "past"
     },
     {
         name: "Mr. Asiri Gawesha",
@@ -115,7 +122,8 @@ export const team: TeamMember[] = [
         ],
         contact: "asiri.g@sliit.lk",
         linkedin: "https://www.linkedin.com/in/asiri-gawesha-090617168/",
-        image: "/assets/images/asiri_gawesha.jpeg"
+        image: "/assets/images/asiri_gawesha.jpeg",
+        status: "current"
     },
     {
         name: "Mr. Sanka Mohottala",
@@ -130,6 +138,91 @@ export const team: TeamMember[] = [
         ],
         contact: "sanka.m@sliit.lk",
         linkedin: "https://www.linkedin.com/in/sankamohottala/",
-        image: "/assets/images/sanka_mohottala.jpeg"
+        image: "/assets/images/sanka_mohottala.jpeg",
+        status: "current"
+    },
+    {
+        name: "Mr. Chethiya Galkaduwa",
+        position: "Research Assistant",
+        university: "Sri Lanka Institute of Information Technology",
+        country: "Sri Lanka",
+        researchInterests: [
+            "Machine Learning",
+            "Artificial Intelligence"
+        ],
+        contact: "chethiya.g@sliit.lk",
+        linkedin: "https://www.linkedin.com/in/chethiya-galkaduwa/",
+        image: "/assets/images/chethiya-galkaduwa.jpeg",
+        status: "past"
+    },
+    {
+        name: "Mr. Nandun Samarasekara",
+        position: "Research Assistant",
+        university: "Sri Lanka Institute of Information Technology",
+        country: "Sri Lanka",
+        researchInterests: [
+            "Machine Learning",
+            "Artificial Intelligence"
+        ],
+        contact: "nandun.s@sliit.lk",
+        linkedin: "https://www.linkedin.com/in/nandun-samarasekara-5564162b8/",
+        image: "/assets/images/nandun-samarasekara.jpeg",
+        status: "current"
+    },
+    {
+        name: "Mr. Hasitha Erandika",
+        position: "Research Assistant",
+        university: "Sri Lanka Institute of Information Technology",
+        country: "Sri Lanka",
+        researchInterests: [
+            "Machine Learning",
+            "Artificial Intelligence"
+        ],
+        contact: "hasitha.e@sliit.lk",
+        linkedin: "https://www.linkedin.com/in/hasitha-erandika/",
+        image: "/assets/images/hasitha-erandika.jpeg",
+        status: "current"
+    },
+    {
+        name: "Ms. Savini Kommalage",
+        position: "Research Assistant",
+        university: "Sri Lanka Institute of Information Technology",
+        country: "Sri Lanka",
+        researchInterests: [
+            "Machine Learning",
+            "Artificial Intelligence"
+        ],
+        contact: "savini.k@sliit.lk",
+        linkedin: "https://www.linkedin.com/in/savini-kommalage/",
+        image: "/assets/images/savini-kommalage.jpeg",
+        status: "current"
+    },
+    {
+        name: "Mr. Krishmal Dinindu",
+        position: "Research Assistant",
+        university: "Sri Lanka Institute of Information Technology",
+        country: "Sri Lanka",
+        researchInterests: [
+            "Machine Learning",
+            "Artificial Intelligence"
+        ],
+        contact: "krishmal.d@sliit.lk",
+        linkedin: "https://www.linkedin.com/in/krishmal-dinidu-a933b4349/",
+        image: "/assets/images/krishmal-dinindu.jpeg",
+        status: "current"
+    },
+    {
+        name: "Mr. Hasitha Hirushan",
+        position: "Research Assistant",
+        university: "Sri Lanka Institute of Information Technology",
+        country: "Sri Lanka",
+        researchInterests: [
+            "Machine Learning",
+            "Artificial Intelligence"
+        ],
+        contact: "hasitha.h@sliit.lk",
+        linkedin: "https://www.linkedin.com/in/hasitha-hirushan/",
+        image: "/assets/images/hasitha-hirushan.jpeg",
+        status: "current"
     }
 ];

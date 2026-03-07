@@ -1,4 +1,22 @@
 User-agent: *
 Allow: /
+Disallow: /assets/
+Disallow: /*.map$
 
-Sitemap: https://brainlabsinc.org/sitemap.xml
+# Block AI scrapers
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+# Sitemap reference removed — submit via Google Search Console / Bing Webmaster Tools

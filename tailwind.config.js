@@ -13,6 +13,7 @@ export default {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
+        // ── Core shadcn/ui tokens (mapped from index.css :root) ──
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -52,9 +53,20 @@ export default {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))'
-        }
+        },
+
+        // ── Page Palette tokens (edit values in index.css) ───────
+        surface: 'hsl(var(--surface))',
+        'surface-hover': 'hsl(var(--surface-hover))',
+
+        // Social / contact channel accent colours
+        'brand-email': 'hsl(var(--brand-email-h) var(--brand-email-s) var(--brand-email-l))',
+        'brand-github': 'hsl(var(--brand-github-h) var(--brand-github-s) var(--brand-github-l))',
+        'brand-linkedin': 'hsl(var(--brand-linkedin-h) var(--brand-linkedin-s) var(--brand-linkedin-l))',
+        'brand-twitter': 'hsl(var(--brand-twitter-h) var(--brand-twitter-s) var(--brand-twitter-l))',
       }
     }
   },
   plugins: [require("tailwindcss-animate")],
 }
+
