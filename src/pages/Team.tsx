@@ -57,7 +57,7 @@ const MemberCard = ({ member, idx, past = false }: { member: TeamMember; idx: nu
                         Research Areas
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                        {member.researchInterests.slice(0, 4).map((interest, i) => (
+                        {[...(member.researchInterests.theoretical || []), ...(member.researchInterests.applied || [])].slice(0, 4).map((interest, i) => (
                             <Badge
                                 key={i}
                                 variant="secondary"
@@ -183,7 +183,9 @@ export const Team = () => {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {currentMembers.map((member, idx) => (
-                            <MemberCard key={member.name} member={member} idx={idx} />
+                            <Link key={member.id} to={`/team/${member.id}`} className="block h-full">
+                                <MemberCard member={member} idx={idx} />
+                            </Link>
                         ))}
                     </div>
                 </div>
@@ -208,7 +210,9 @@ export const Team = () => {
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                             {pastMembers.map((member, idx) => (
-                                <MemberCard key={member.name} member={member} idx={idx} past />
+                                <Link key={member.id} to={`/team/${member.id}`} className="block h-full">
+                                    <MemberCard member={member} idx={idx} past />
+                                </Link>
                             ))}
                         </div>
                     </div>
