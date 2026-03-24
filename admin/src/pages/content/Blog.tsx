@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Star, X, ChevronDown } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X, ChevronDown } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { api, type Blog as BlogType } from "../../lib/api";
 
@@ -25,8 +25,9 @@ const EMPTY: Partial<BlogType> = {
 };
 
 export default function BlogPage() {
-  const { token, role } = useAuth();
+  const { token, role, user } = useAuth();
   const isAdmin = role === "super_admin";
+  const memberId = user?.id;
   const t = token ?? "";
   const [items, setItems] = useState<BlogType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,12 +37,21 @@ export default function BlogPage() {
 
   useEffect(() => {
     if (t) {
-      api.blog.list(t).then((data) => { setItems(data); setLoading(false); }).catch(err => {
+      api.blog.list(t).then((data) => {
+        let filtered = data;
+        if (isAdmin) {
+          filtered = data.filter(p => p.status !== "DRAFT");
+        } else if (memberId) {
+          filtered = data.filter(p => p.member_id === memberId);
+        }
+        setItems(filtered);
+        setLoading(false);
+      }).catch(err => {
         console.error("Failed to fetch blogs", err);
         setLoading(false);
       });
     }
-  }, [t]);
+  }, [t, isAdmin, memberId]);
 
   const generateSlug = (title: string) =>
     title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -94,11 +104,13 @@ export default function BlogPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-zinc-900">Blog Posts</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Manage articles and announcements</p>
+          <p className="text-sm text-zinc-500 mt-0.5">{isAdmin ? "Review and moderate blog articles" : "Manage your articles and announcements"}</p>
         </div>
-        <button onClick={() => setEditing(EMPTY)} className="flex items-center gap-2 bg-black text-white text-sm font-medium rounded-lg px-4 py-2 hover:bg-zinc-800 transition-colors">
-          <Plus size={15} /> New Post
-        </button>
+        {!isAdmin && (
+          <button onClick={() => setEditing(EMPTY)} className="flex items-center gap-2 bg-black text-white text-sm font-medium rounded-lg px-4 py-2 hover:bg-zinc-800 transition-colors">
+            <Plus size={15} /> New Post
+          </button>
+        )}
       </div>
 
       <div className="bg-white border border-zinc-100 rounded-xl overflow-hidden">
@@ -129,17 +141,42 @@ export default function BlogPage() {
                   <td className="px-5 py-4"><StatusPill status={post.status} /></td>
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
-                      {isAdmin && (
-                        <button onClick={() => handleTogglePublish(post)} className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors" title={post.status === "PUBLISHED" ? "Unpublish" : "Publish"}>
-                          <Star size={14} fill={post.status === "PUBLISHED" ? "currentColor" : "none"} />
-                        </button>
+                      {isAdmin ? (
+                        <>
+                          {post.status === "PENDING_REVIEW" && (
+                            <button
+                              onClick={() => handleTogglePublish(post)}
+                              className="px-3 py-1 bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-md hover:bg-emerald-600 transition-colors"
+                            >
+                              Approve
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setEditing(post)}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                          >
+                            <Search size={14} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {post.status === "DRAFT" && (
+                            <button
+                              onClick={() => setEditing(post)}
+                              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDelete(post.id!)}
+                            disabled={deletingId === post.id || post.status !== "DRAFT"}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
                       )}
-                      <button onClick={() => setEditing(post)} className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors">
-                        <Pencil size={14} />
-                      </button>
-                      <button onClick={() => handleDelete(post.id!)} disabled={deletingId === post.id} className="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40">
-                        <Trash2 size={14} />
-                      </button>
                     </div>
                   </td>
                 </tr>

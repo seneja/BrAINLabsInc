@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Star, X, ChevronDown } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X, ChevronDown } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { api, type Grant } from "../../lib/api";
 
@@ -27,8 +27,9 @@ function Field({ label, children, colSpan = false }: { label: string; children: 
 }
 
 export default function Grants() {
-  const { token, role } = useAuth();
+  const { token, role, user } = useAuth();
   const isAdmin = role === "super_admin";
+  const memberId = user?.id;
   const t = token ?? "";
   const [items, setItems] = useState<Grant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,12 +39,21 @@ export default function Grants() {
 
   useEffect(() => { 
     if (t) {
-      api.grants.list(t).then((d) => { setItems(d); setLoading(false); }).catch(err => {
+      api.grants.list(t).then((data) => {
+        let filtered = data;
+        if (isAdmin) {
+          filtered = data.filter(g => g.status !== "DRAFT");
+        } else if (memberId) {
+          filtered = data.filter(g => g.member_id === memberId);
+        }
+        setItems(filtered);
+        setLoading(false);
+      }).catch(err => {
         console.error("Failed to fetch grants", err);
         setLoading(false);
       });
     }
-  }, [t]);
+  }, [t, isAdmin, memberId]);
 
   const handleSave = async () => {
     if (!editing) return;
@@ -91,11 +101,13 @@ export default function Grants() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-zinc-900">Research Grants</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Manage funding and awarded grants</p>
+          <p className="text-sm text-zinc-500 mt-0.5">{isAdmin ? "Review and moderate research grants" : "Manage your funding and awarded grants"}</p>
         </div>
-        <button onClick={() => setEditing(EMPTY)} className="flex items-center gap-2 bg-black text-white text-sm font-medium rounded-lg px-4 py-2 hover:bg-zinc-800 transition-colors">
-          <Plus size={15} /> New Grant
-        </button>
+        {!isAdmin && (
+          <button onClick={() => setEditing(EMPTY)} className="flex items-center gap-2 bg-black text-white text-sm font-medium rounded-lg px-4 py-2 hover:bg-zinc-800 transition-colors">
+            <Plus size={15} /> New Grant
+          </button>
+        )}
       </div>
 
       <div className="bg-white border border-zinc-100 rounded-xl overflow-hidden flex-1 flex flex-col">
@@ -124,13 +136,42 @@ export default function Grants() {
                     <td className="px-5 py-4"><StatusPill status={item.status} /></td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        {isAdmin && (
-                          <button onClick={() => handleTogglePublish(item)} className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors">
-                            <Star size={14} fill={item.status === "PUBLISHED" ? "currentColor" : "none"} />
-                          </button>
+                        {isAdmin ? (
+                          <>
+                            {item.status === "PENDING_REVIEW" && (
+                              <button
+                                onClick={() => handleTogglePublish(item)}
+                                className="px-3 py-1 bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-md hover:bg-emerald-600 transition-colors"
+                              >
+                                Approve
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setEditing(item)}
+                              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                            >
+                              <Search size={14} />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {item.status === "DRAFT" && (
+                              <button
+                                onClick={() => setEditing(item)}
+                                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                              >
+                                <Pencil size={14} />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDelete(item.id!)}
+                              disabled={deletingId === item.id || item.status !== "DRAFT"}
+                              className="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
                         )}
-                        <button onClick={() => setEditing(item)} className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"><Pencil size={14} /></button>
-                        <button onClick={() => handleDelete(item.id!)} disabled={deletingId === item.id} className="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40"><Trash2 size={14} /></button>
                       </div>
                     </td>
                   </tr>

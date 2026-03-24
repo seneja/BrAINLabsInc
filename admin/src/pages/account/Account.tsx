@@ -29,7 +29,8 @@ const TABS: TabConfig[] = [
 ];
 
 export default function Account() {
-  const { token } = useAuth();
+  const { token, role } = useAuth();
+  const isAdmin = role === "super_admin";
   const t = token ?? "";
   
   const [activeTab, setActiveTab] = useState<TabId>("basic");
@@ -37,6 +38,12 @@ export default function Account() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  // Filter tabs based on role: Super Admin only gets Basic Info
+  const filteredTabs = TABS.filter(tab => {
+    if (isAdmin) return tab.id === "basic";
+    return true;
+  });
 
   const fetchCV = async () => {
     if (!t) return;
@@ -82,7 +89,7 @@ export default function Account() {
           <p className="text-sm text-zinc-500 mb-6">Manage your CV and platform settings</p>
           
           <nav className="space-y-1">
-            {TABS.map((tab) => (
+            {filteredTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Star, Sparkles, X, ChevronDown } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Sparkles, X, ChevronDown } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { api, type ResearchPublication } from "../../lib/api";
 
@@ -26,8 +26,9 @@ const EMPTY: Partial<ResearchPublication> = {
 };
 
 export default function Publications() {
-  const { token, role } = useAuth();
+  const { token, role, user } = useAuth();
   const isAdmin = role === "super_admin";
+  const memberId = user?.id;
   const t = token ?? "";
   const [items, setItems] = useState<ResearchPublication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,12 +40,24 @@ export default function Publications() {
 
   useEffect(() => {
     if (t) {
-      api.publications.list(t).then((data) => { setItems(data); setLoading(false); }).catch(err => {
+      api.publications.list(t).then((data) => { 
+        // RBAC Filtering
+        let filtered = data;
+        if (isAdmin) {
+          // Admin sees everything that is NOT a draft (Pending or Published)
+          filtered = data.filter(p => p.status !== "DRAFT");
+        } else if (memberId) {
+          // Researcher sees only their own items
+          filtered = data.filter(p => p.member_id === memberId);
+        }
+        setItems(filtered); 
+        setLoading(false); 
+      }).catch(err => {
         console.error("Failed to fetch publications", err);
         setLoading(false);
       });
     }
-  }, [t]);
+  }, [t, isAdmin, memberId]);
 
   const handleSave = async () => {
     if (!editing) return;
@@ -109,14 +122,16 @@ export default function Publications() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-zinc-900">Publications</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Manage research publications</p>
+          <p className="text-sm text-zinc-500 mt-0.5">{isAdmin ? "Review and moderate research publications" : "Manage your research publications"}</p>
         </div>
-        <button
-          onClick={() => { setEditing(EMPTY); setAiSummary(""); }}
-          className="flex items-center gap-2 bg-black text-white text-sm font-medium rounded-lg px-4 py-2 hover:bg-zinc-800 transition-colors"
-        >
-          <Plus size={15} /> New Publication
-        </button>
+        {!isAdmin && (
+          <button
+            onClick={() => { setEditing(EMPTY); setAiSummary(""); }}
+            className="flex items-center gap-2 bg-black text-white text-sm font-medium rounded-lg px-4 py-2 hover:bg-zinc-800 transition-colors"
+          >
+            <Plus size={15} /> New Publication
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -150,28 +165,45 @@ export default function Publications() {
                   <td className="px-5 py-4"><StatusPill status={pub.status} /></td>
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
-                      {isAdmin && (
-                        <button
-                          onClick={() => handleTogglePublish(pub)}
-                          className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
-                          title={pub.status === "PUBLISHED" ? "Unpublish" : "Publish"}
-                        >
-                          <Star size={14} fill={pub.status === "PUBLISHED" ? "currentColor" : "none"} />
-                        </button>
+                      {isAdmin ? (
+                        <>
+                          {pub.status === "PENDING_REVIEW" && (
+                            <button
+                              onClick={() => handleTogglePublish(pub)}
+                              className="px-3 py-1 bg-zinc-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-md hover:bg-emerald-600 transition-colors"
+                            >
+                              Approve
+                            </button>
+                          )}
+                          <button
+                            onClick={() => { setEditing(pub); setAiSummary(""); }}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                            title="View Details"
+                          >
+                            <Search size={14} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {pub.status === "DRAFT" && (
+                             <button
+                               onClick={() => { setEditing(pub); setAiSummary(""); }}
+                               className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                               title="Edit"
+                             >
+                               <Pencil size={14} />
+                             </button>
+                          )}
+                          <button
+                            onClick={() => handleDelete(pub.id!)}
+                            disabled={deletingId === pub.id || pub.status !== "DRAFT"}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40"
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
                       )}
-                      <button
-                        onClick={() => { setEditing(pub); setAiSummary(""); }}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(pub.id!)}
-                        disabled={deletingId === pub.id}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-40"
-                      >
-                        <Trash2 size={14} />
-                      </button>
                     </div>
                   </td>
                 </tr>

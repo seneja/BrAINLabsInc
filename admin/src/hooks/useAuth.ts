@@ -8,6 +8,7 @@ import { persist } from "zustand/middleware";
 const BASE_URL = import.meta.env.VITE_API_URL ?? "";
 
 export interface AuthUser {
+  id: string;
   name: string;
   email: string;
   avatar?: string;
@@ -56,6 +57,7 @@ export const useAuth = create<AuthState>()(
           const data = await res.json() as {
             token: string;
             member: {
+              id: string;
               name: string;
               contact_email?: string;
               image_url?: string;
@@ -73,6 +75,7 @@ export const useAuth = create<AuthState>()(
             role,
             status: data.member.status as any,
             user: {
+              id: data.member.id,
               name: data.member.name,
               email: data.member.contact_email ?? email,
               avatar: data.member.image_url ?? "",
